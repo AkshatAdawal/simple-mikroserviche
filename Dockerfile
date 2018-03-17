@@ -1,13 +1,10 @@
-FROM golang:1.10.0-alpine3.7
+FROM alpine
 MAINTAINER Akshat Adawal
 
-ENV SOURCES /go/src/simple-mikroserviche/simple-mikroserviche
-
-COPY . ${SOURCES}
-
-RUN cd ${SOURCES} && CGO_ENABLED=0 go install
+COPY simple-mikroserviche /go/simple-mikroserviche
+RUN chmod +x /go/simple-mikroserviche
 
 ENV PORT 8089
 EXPOSE 8089
 
-ENTRYPOINT simple-mikroserviche
+ENTRYPOINT /go/simple-mikroserviche
