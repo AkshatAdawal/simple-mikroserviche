@@ -1,0 +1,15 @@
+version: '2'
+services:
+  microservice:
+    build: .
+    image: book-store:1.0.1-alpine
+    environment:
+    - PORT=8089
+    ports:
+    - "8089:8089"
+  nginx:
+      image: "nginx:1.11.9"
+      ports:
+      - "8080:80"
+      links:
+      - microservice
