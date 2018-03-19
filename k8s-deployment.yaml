@@ -1,0 +1,59 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: book-store
+  #key - value pair
+  labels:
+    app: book-store
+spec:
+  replicas: 3
+  revisionHistoryLimit: 10
+  minReadySeconds: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      #create at most 2 new pods for new update
+      maxSurge: 2
+  template:
+    metadata:
+      labels:
+        app: book-store
+        tier: services
+    spec:
+      containers:
+      - name: book-store
+        image: "book-store:1.0.1-alpine"
+        ports:
+        - containerPort: 8089
+        env:
+        - name: port
+          value: "8089"
+      #requests -> memory cpu resources used to schedule pods
+      #limits -> if these are exceeded they will be killed and restarted
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "125m"
+          limits:
+            memory: "128Mi"
+            cpu: "250m"
+        #2 types of probes that we need to know
+        #an http request k8s issues against our pods
+        #only pods that respond with status OK will be considered
+        # ready and given traffic
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8089
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+        #issued against pod, if anything other than 200 received
+        #this is considered unhealthy and restarted automatically by k8s
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8089
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+
